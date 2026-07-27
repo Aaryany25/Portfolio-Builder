@@ -2,7 +2,8 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+    <div className="flex relative flex-col flex-1 items-center  justify-center bg-zinc-50 font-sans dark:bg-black">
+      <div className='absolute inset-y-0 right-32 h-full w-px  bg-linear-to-b from-neutral-300 to-blue-600  '></div>
       <main className="flex flex-1 w-full max-w-7xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
       
         <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
@@ -33,6 +34,8 @@ export default function Home() {
           </a>
         </div>
       </main>
+      <div className='absolute inset-y-0 left-32 h-full w-px  bg-linear-to-b from-neutral-300 to-blue-600   '></div>
+
     </div>
   );
 }
