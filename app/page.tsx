@@ -6,10 +6,10 @@ export default function Home() {
     <div className="flex relative flex-col flex-1 items-center  justify-center bg-zinc-50 font-sans dark:bg-black">
       <div className='absolute inset-y-0 right-32 h-full w-px  bg-linear-to-b from-neutral-300 to-blue-600  '></div>
     
-      <main className="flex flex-1 w-full max-w-7xl flex-col items-center justify-between py-2 px-16 bg-white dark:bg-black sm:items-start">
+      <main className="flex flex-1 w-full max-w-7xl flex-col items-center gap-20 py-2 px-16 bg-white dark:bg-black sm:items-start">
       <Navbar/>
         <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-5xl text-7xl font-bold  tracking-tighter text-black dark:text-zinc-50">
+          <h1 className="max-w-5xl text-7xl font-bold  tracking-tighter text-black dark:text-zinc-50 mt-5">
             Choose the Portfolio Template and Deploy it within 5 mins
           </h1>
           <p className="max-w-3xl text-lg leading-8 text-zinc-600 dark:text-zinc-400">
