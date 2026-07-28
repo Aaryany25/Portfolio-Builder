@@ -1,11 +1,13 @@
 import Image from "next/image";
-
+import Link from "next/link";
+import Navbar from "./components/Navbar";
 export default function Home() {
   return (
     <div className="flex relative flex-col flex-1 items-center  justify-center bg-zinc-50 font-sans dark:bg-black">
       <div className='absolute inset-y-0 right-32 h-full w-px  bg-linear-to-b from-neutral-300 to-blue-600  '></div>
-      <main className="flex flex-1 w-full max-w-7xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-      
+    
+      <main className="flex flex-1 w-full max-w-7xl flex-col items-center justify-between py-2 px-16 bg-white dark:bg-black sm:items-start">
+      <Navbar/>
         <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
           <h1 className="max-w-5xl text-7xl font-bold  tracking-tighter text-black dark:text-zinc-50">
             Choose the Portfolio Template and Deploy it within 5 mins
@@ -24,14 +26,12 @@ export default function Home() {
            
             View Templates
           </a>
-          <a
+          <Link
             className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/connect"
           >
             Login
-          </a>
+          </Link>
         </div>
       </main>
       <div className='absolute inset-y-0 left-32 h-full w-px  bg-linear-to-b from-neutral-300 to-blue-600   '></div>
