@@ -3,8 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Inter } from 'next/font/google'
 
 import "./globals.css";
-import Navbar from "./components/Navbar";
-
+import Providers from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,8 +32,9 @@ export default function RootLayout({
       className={`${inter.className} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-neutral-100 dark:bg-neutral-700">
-   <Navbar/>
-        {children}</body>
+   {/* <Navbar/> */}
+   <Providers>{children}</Providers>
+       </body>
     </html>
   );
 }
