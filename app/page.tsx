@@ -82,7 +82,7 @@ export default function Home() {
 
               {/* Action Options */}
               <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full md:w-auto">
-                <Link href="https://vercel.com/new" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+                <Link href="/Template"  rel="noopener noreferrer" className="w-full sm:w-auto">
                   <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-md shadow-blue-600/20 rounded-xl px-5 h-11 flex items-center justify-center gap-2">
                     <LayoutGrid className="w-4 h-4" />
                     <span>View Templates</span>

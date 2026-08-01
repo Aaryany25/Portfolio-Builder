@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
+import GithubHeatmap from "../components/GithubHeatmap";
 import {
   Search,
   Moon,
@@ -146,7 +147,7 @@ export default function TemplatePage() {
     try {
       const [userRes, reposRes] = await Promise.all([
         fetch(`https://api.github.com/users/${encodeURIComponent(user)}`),
-        fetch(`https://api.github.com/users/${encodeURIComponent(user)}/repos?sort=updated&per_page=10`),
+        fetch(`https://api.github.com/users/${encodeURIComponent(user)}/repos?sort=updated&per_page=3`),
       ]);
 
       if (!userRes.ok) {
@@ -237,6 +238,9 @@ export default function TemplatePage() {
             </Link>
             <Link href="#projects" className="hover:text-zinc-900 dark:hover:text-white transition-colors">
               Projects
+            </Link>
+            <Link href="#contributions" className="hover:text-zinc-900 dark:hover:text-white transition-colors">
+              Activity
             </Link>
             <Link href="#work" className="hover:text-zinc-900 dark:hover:text-white transition-colors">
               Experience
@@ -487,6 +491,11 @@ export default function TemplatePage() {
               </button>
             </div>
           )}
+        </section>
+
+        {/* GitHub Heatmap Section */}
+        <section id="contributions">
+          <GithubHeatmap username={currentUsername} isDarkMode={isDarkMode} />
         </section>
 
         {/* Experience Section */}
