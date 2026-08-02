@@ -1,0 +1,38 @@
+{
+  "aaryany2505@gmail.com": {
+    "userId": "aaryany2505@gmail.com",
+    "name": "Aaryan Yadav",
+    "tagline": "Full Stack Software Engineer & Builder",
+    "bio": "Building thoughtful web applications, open source tools, and digital experiences.",
+    "about": "I am a passionate Full Stack Engineer experienced with modern web frameworks, React, Next.js, Node.js, and TypeScript. I love crafting clean user interfaces, robust backend APIs, and scaling applications.",
+    "location": "Mumbai, India",
+    "email": "aaryan@example.com",
+    "avatarUrl": "https://github.com/Aaryany25.png",
+    "githubUsername": "Aaryany25",
+    "resumeUrl": "#",
+    "skills": [
+      "TypeScript",
+      "React",
+      "Next.js",
+      "Node.js",
+      "Tailwind CSS",
+      "PostgreSQL",
+      "Docker",
+      "Git",
+      "GraphQL",
+      "REST APIs"
+    ],
+    "experiences": [],
+    "projects": [],
+    "socialLinks": {
+      "github": "https://github.com/Aaryany25",
+      "linkedin": "https://linkedin.com/in/aaryan",
+      "twitter": "https://x.com/aaryan",
+      "youtube": "",
+      "instagram": "",
+      "substack": "",
+      "website": ""
+    },
+    "updatedAt": "2026-08-01T07:50:03.686Z"
+  }
+}

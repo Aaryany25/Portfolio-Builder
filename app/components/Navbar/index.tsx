@@ -22,14 +22,25 @@ export default function Navbar() {
     <header className="w-full border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md sticky top-0 z-50 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand / Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
-            <Sparkles className="w-5 h-5" />
-          </div>
-          <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-600 dark:from-white dark:via-zinc-200 dark:to-zinc-400 bg-clip-text text-transparent">
-            PortfolioBuilder
-          </span>
-        </Link>
+        <div className="flex items-center gap-6">
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-600 dark:from-white dark:via-zinc-200 dark:to-zinc-400 bg-clip-text text-transparent">
+              PortfolioBuilder
+            </span>
+          </Link>
+
+          <nav className="hidden sm:flex items-center gap-4 text-xs font-medium text-zinc-600 dark:text-zinc-400">
+            <Link href="/dashboard" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+              User Dashboard
+            </Link>
+            <Link href="/Template" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+              Portfolio Template
+            </Link>
+          </nav>
+        </div>
 
         {/* User Info / Sign In */}
         <div className="flex items-center gap-4">
@@ -44,6 +55,7 @@ export default function Navbar() {
                     alt={session.user.name || "User Avatar"}
                     width={32}
                     height={32}
+                    unoptimized
                     className="rounded-full ring-2 ring-blue-500/30 object-cover"
                   />
                 ) : (

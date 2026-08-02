@@ -1,30 +1,33 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { Suspense, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { usePortfolio } from "@/context/PortfolioContext";
 import GithubHeatmap from "../components/GithubHeatmap";
 import {
   Search,
   Moon,
   Sun,
   ExternalLink,
-  Calendar,
-  ArrowRight,
   Mail,
   X,
   Star,
   GitFork,
   MapPin,
-  Users,
-  Code,
   Loader2,
   RefreshCw,
+  Edit3,
+  Globe,
+  FileText,
+  Briefcase,
+  FolderGit2,
+  Code2,
 } from "lucide-react";
 
-// Social Icons SVGs for precision styling
+// Social Icons SVGs
 function XIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
     <svg className={className} fill="currentColor" viewBox="0 0 24 24">
@@ -109,9 +112,10 @@ function extractUsername(input: string): string {
   return cleaned.replace(/^@/, "").trim() || "Aaryany25";
 }
 
-export default function TemplatePage() {
+function TemplateContent() {
   const searchParams = useSearchParams();
   const { data: session } = useSession();
+  const { portfolio, loadUserPortfolio } = usePortfolio();
 
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showAllExperience, setShowAllExperience] = useState(false);
@@ -119,43 +123,43 @@ export default function TemplatePage() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const [inputUsername, setInputUsername] = useState("Aaryany25");
-  const [currentUsername, setCurrentUsername] = useState("Aaryany25");
+  const [inputUsername, setInputUsername] = useState(portfolio.githubUsername || "Aaryany25");
+  const [currentUsername, setCurrentUsername] = useState(portfolio.githubUsername || "Aaryany25");
   const [githubUser, setGithubUser] = useState<GithubProfile | null>(null);
   const [repos, setRepos] = useState<GithubRepo[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize username from URL param or session
+  // Sync username from URL query param or context portfolio
   useEffect(() => {
     const urlUser = searchParams?.get("username") || searchParams?.get("user");
     if (urlUser) {
       const parsed = extractUsername(urlUser);
       setCurrentUsername(parsed);
       setInputUsername(parsed);
-    } else if (session?.user?.name) {
-      const parsed = extractUsername(session.user.name);
-      setCurrentUsername(parsed);
-      setInputUsername(parsed);
+      loadUserPortfolio(parsed);
+    } else if (portfolio.githubUsername) {
+      setCurrentUsername(portfolio.githubUsername);
+      setInputUsername(portfolio.githubUsername);
     }
-  }, [searchParams, session]);
+  }, [searchParams, portfolio.githubUsername, loadUserPortfolio]);
 
-  // Fetch GitHub API data
+  // Fetch GitHub API data for repos and activity
   const fetchGithubData = useCallback(async (user: string) => {
     setLoading(true);
     setError(null);
     try {
       const [userRes, reposRes] = await Promise.all([
         fetch(`https://api.github.com/users/${encodeURIComponent(user)}`),
-        fetch(`https://api.github.com/users/${encodeURIComponent(user)}/repos?sort=updated&per_page=3`),
+        fetch(`https://api.github.com/users/${encodeURIComponent(user)}/repos?sort=updated&per_page=6`),
       ]);
 
-      if (!userRes.ok) {
-        throw new Error(`GitHub user "${user}" not found.`);
+      if (userRes.ok) {
+        const userData: GithubProfile = await userRes.json();
+        setGithubUser(userData);
+      } else {
+        setGithubUser(null);
       }
-
-      const userData: GithubProfile = await userRes.json();
-      setGithubUser(userData);
 
       if (reposRes.ok) {
         const reposData: GithubRepo[] = await reposRes.json();
@@ -164,7 +168,7 @@ export default function TemplatePage() {
         setRepos([]);
       }
     } catch (err: any) {
-      setError(err.message || "Failed to load GitHub data.");
+      setError(err?.message || "Failed to load GitHub API data.");
       setGithubUser(null);
       setRepos([]);
     } finally {
@@ -176,7 +180,7 @@ export default function TemplatePage() {
     fetchGithubData(currentUsername);
   }, [currentUsername, fetchGithubData]);
 
-  // Cmd+K shortcut listener
+  // Keyboard shortcut Ctrl+K
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -195,45 +199,27 @@ export default function TemplatePage() {
     setCurrentUsername(clean);
   };
 
-  const experiences = [
-    {
-      company: "ASBL",
-      status: "Working",
-      role: "SDE-L1 (Full Stack)",
-      period: "January 2026 - Present",
-      location: "Hyderabad, India (On-Site)",
-    },
-    {
-      company: "Promote",
-      role: "Founding Frontend Engineer",
-      period: "August 2025 - December 2025",
-      location: "United States (Remote)",
-    },
-    {
-      company: "Upsurge Labs",
-      role: "Backend Developer Intern",
-      period: "June 2025 - July 2025",
-      location: "Bangalore, India (On-Site)",
-    },
-    {
-      company: "TechNova Corp",
-      role: "Software Engineering Fellow",
-      period: "January 2025 - May 2025",
-      location: "Remote",
-    },
-  ];
-
+  const experiences = portfolio.experiences?.length > 0 ? portfolio.experiences : [];
   const visibleExperiences = showAllExperience ? experiences : experiences.slice(0, 3);
   const visibleRepos = showAllRepos ? repos : repos.slice(0, 3);
 
+  // Derive display values from Context Portfolio with fallbacks
+  const displayName = portfolio.name || githubUser?.name || currentUsername;
+  const displayTagline = portfolio.tagline || githubUser?.bio || "Full Stack Software Engineer";
+  const displayBio = portfolio.bio || githubUser?.bio || "Building modern web applications and open source tools.";
+  const displayAbout = portfolio.about || displayBio;
+  const displayLocation = portfolio.location || githubUser?.location || "Remote Developer";
+  const displayAvatar = portfolio.avatarUrl || githubUser?.avatar_url || "/pixel_dev_avatar.png";
+  const displayEmail = portfolio.email || githubUser?.email || "";
+
   return (
-    <div className={`min-h-screen ${isDarkMode ? "dark bg-zinc-950 text-zinc-100" : "bg-[#fcfbf9] text-zinc-900"} font-sans transition-colors duration-200 selection:bg-zinc-800 selection:text-white dark:selection:bg-zinc-200 dark:selection:text-zinc-900`}>
+    <div className={`min-h-screen ${isDarkMode ? "dark bg-zinc-950 text-zinc-100" : "bg-[#fcfbf9] text-zinc-900"} font-sans transition-colors duration-200 selection:bg-zinc-800 selection:text-white dark:selection:bg-zinc-200 dark:selection:text-zinc-900 pb-16`}>
       {/* Outer Centered Container */}
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-10">
         {/* Top Header / Navigation */}
         <header className="flex items-center justify-between text-sm text-zinc-500 dark:text-zinc-400">
-          <nav className="flex items-center gap-5">
-            <Link href="#home" className="hover:text-zinc-900 dark:hover:text-white transition-colors font-medium text-zinc-900 dark:text-white">
+          <nav className="flex items-center gap-4 sm:gap-5 text-xs sm:text-sm">
+            <Link href="/" className="hover:text-zinc-900 dark:hover:text-white transition-colors">
               Home
             </Link>
             <Link href="#projects" className="hover:text-zinc-900 dark:hover:text-white transition-colors">
@@ -245,19 +231,26 @@ export default function TemplatePage() {
             <Link href="#work" className="hover:text-zinc-900 dark:hover:text-white transition-colors">
               Experience
             </Link>
-            <Link href="#resume" className="hover:text-zinc-900 dark:hover:text-white transition-colors">
-              Resume
-            </Link>
           </nav>
 
           <div className="flex items-center gap-3">
+            {/* Dashboard Link Shortcut */}
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-blue-500/30 bg-blue-500/10 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 transition-colors"
+              title="Edit details in User Dashboard"
+            >
+              <Edit3 className="w-3.5 h-3.5" />
+              <span>Dashboard</span>
+            </Link>
+
             {/* Search Trigger Button */}
             <button
               onClick={() => setIsSearchOpen(true)}
-              className="flex items-center gap-2 px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-100/60 dark:bg-zinc-900/60 text-xs text-zinc-500 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+              className="flex items-center gap-2 px-2 py-1 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-100/60 dark:bg-zinc-900/60 text-xs text-zinc-500 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
             >
               <Search className="w-3.5 h-3.5" />
-              <span className="font-mono text-[11px] bg-zinc-200 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-600 dark:text-zinc-300">
+              <span className="hidden sm:inline font-mono text-[11px] bg-zinc-200 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-600 dark:text-zinc-300">
                 Ctrl K
               </span>
             </button>
@@ -265,7 +258,7 @@ export default function TemplatePage() {
             {/* Dark Mode Toggle */}
             <button
               onClick={() => setIsDarkMode(!isDarkMode)}
-              className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-100/60 dark:bg-zinc-900/60 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200/60 dark:hover:bg-zinc-800 transition-colors"
+              className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-100/60 dark:bg-zinc-900/60 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200/60 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
               title="Toggle theme"
             >
               {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -305,7 +298,6 @@ export default function TemplatePage() {
         {/* Profile / Bio Section */}
         <section id="home" className="flex flex-col gap-5 pt-1">
           {loading ? (
-            /* Skeleton Shimmer Loading State */
             <div className="space-y-4 animate-pulse">
               <div className="w-20 h-20 rounded-full bg-zinc-200 dark:bg-zinc-800" />
               <div className="h-6 w-48 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
@@ -314,17 +306,17 @@ export default function TemplatePage() {
             </div>
           ) : (
             <>
-              {/* Avatar and Pixel Art Accent */}
+              {/* Avatar */}
               <div className="relative w-fit">
-                <div className="absolute -top-6 left-6 text-base animate-bounce">
-                  🐱
+                <div className="absolute -top-6 left-6 text-base animate-bounce select-none">
+                  ⚡
                 </div>
-
                 <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-zinc-200 dark:border-zinc-800 shadow-sm bg-zinc-100 dark:bg-zinc-900">
                   <Image
-                    src={githubUser?.avatar_url || "/pixel_dev_avatar.png"}
-                    alt={githubUser?.name || currentUsername}
+                    src={displayAvatar}
+                    alt={displayName}
                     fill
+                    unoptimized
                     className="object-cover"
                     priority
                   />
@@ -334,34 +326,37 @@ export default function TemplatePage() {
               {/* User Name & Subtitle */}
               <div className="space-y-1">
                 <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
-                  {githubUser?.name || currentUsername}
+                  {displayName}
                 </h1>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono flex flex-wrap items-center gap-1.5">
                   <span>@{githubUser?.login || currentUsername}</span>
                   <span>·</span>
                   <span className="inline-flex items-center gap-1">
                     <MapPin className="w-3 h-3 text-zinc-400" />
-                    {githubUser?.location || "Remote Developer"}
+                    {displayLocation}
                   </span>
-                  {githubUser?.blog && (
+                  {portfolio.socialLinks?.website && (
                     <>
                       <span>·</span>
                       <a
-                        href={githubUser.blog.startsWith("http") ? githubUser.blog : `https://${githubUser.blog}`}
+                        href={portfolio.socialLinks.website}
                         target="_blank"
                         rel="noreferrer"
                         className="hover:underline text-zinc-700 dark:text-zinc-300 inline-flex items-center gap-0.5"
                       >
-                        {githubUser.blog.replace(/^https?:\/\//, "")} <ExternalLink className="w-3 h-3" />
+                        <Globe className="w-3 h-3" /> Website
                       </a>
                     </>
                   )}
+                </p>
+                <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 pt-0.5">
+                  {displayTagline}
                 </p>
               </div>
 
               {/* Bio Line */}
               <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                {githubUser?.bio || "Passionate software engineer building modern open-source web applications and high-performance tools."}
+                {displayBio}
               </p>
 
               {/* Live GitHub Stats Pill */}
@@ -370,37 +365,99 @@ export default function TemplatePage() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                <span className="text-zinc-500 dark:text-zinc-400">GitHub API Live —</span>
+                <span className="text-zinc-500 dark:text-zinc-400">Live Data —</span>
                 <span className="font-medium text-zinc-800 dark:text-zinc-200">
-                  {githubUser?.public_repos || 0} Repositories · {githubUser?.followers || 0} Followers
+                  {githubUser?.public_repos || repos.length} Repositories · {githubUser?.followers || 0} Followers
                 </span>
               </div>
 
               {/* Social Icons Strip */}
               <div className="flex items-center gap-3.5 pt-1 text-zinc-500 dark:text-zinc-400">
-                {githubUser?.html_url && (
-                  <a href={githubUser.html_url} target="_blank" rel="noreferrer" className="hover:text-zinc-900 dark:hover:text-white transition-colors" title="GitHub Profile">
+                {(portfolio.socialLinks?.github || githubUser?.html_url) && (
+                  <a
+                    href={portfolio.socialLinks?.github || githubUser?.html_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:text-zinc-900 dark:hover:text-white transition-colors"
+                    title="GitHub Profile"
+                  >
                     <GithubIcon className="w-4 h-4" />
                   </a>
                 )}
-                <a href="https://x.com" target="_blank" rel="noreferrer" className="hover:text-zinc-900 dark:hover:text-white transition-colors" title="X">
-                  <XIcon className="w-4 h-4" />
-                </a>
-                <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="hover:text-zinc-900 dark:hover:text-white transition-colors" title="LinkedIn">
-                  <LinkedinIcon className="w-4 h-4" />
-                </a>
-                <a href="https://youtube.com" target="_blank" rel="noreferrer" className="hover:text-zinc-900 dark:hover:text-white transition-colors" title="YouTube">
-                  <YoutubeIcon className="w-4 h-4" />
-                </a>
-                <a href="https://instagram.com" target="_blank" rel="noreferrer" className="hover:text-zinc-900 dark:hover:text-white transition-colors" title="Instagram">
-                  <InstagramIcon className="w-4 h-4" />
-                </a>
-                <a href="https://substack.com" target="_blank" rel="noreferrer" className="hover:text-zinc-900 dark:hover:text-white transition-colors" title="Substack">
-                  <SubstackIcon className="w-4 h-4" />
-                </a>
-                {githubUser?.email && (
-                  <a href={`mailto:${githubUser.email}`} className="hover:text-zinc-900 dark:hover:text-white transition-colors" title="Email">
+                {portfolio.socialLinks?.twitter && (
+                  <a
+                    href={portfolio.socialLinks.twitter}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:text-zinc-900 dark:hover:text-white transition-colors"
+                    title="X / Twitter"
+                  >
+                    <XIcon className="w-4 h-4" />
+                  </a>
+                )}
+                {portfolio.socialLinks?.linkedin && (
+                  <a
+                    href={portfolio.socialLinks.linkedin}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:text-zinc-900 dark:hover:text-white transition-colors"
+                    title="LinkedIn"
+                  >
+                    <LinkedinIcon className="w-4 h-4" />
+                  </a>
+                )}
+                {portfolio.socialLinks?.youtube && (
+                  <a
+                    href={portfolio.socialLinks.youtube}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:text-zinc-900 dark:hover:text-white transition-colors"
+                    title="YouTube"
+                  >
+                    <YoutubeIcon className="w-4 h-4" />
+                  </a>
+                )}
+                {portfolio.socialLinks?.instagram && (
+                  <a
+                    href={portfolio.socialLinks.instagram}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:text-zinc-900 dark:hover:text-white transition-colors"
+                    title="Instagram"
+                  >
+                    <InstagramIcon className="w-4 h-4" />
+                  </a>
+                )}
+                {portfolio.socialLinks?.substack && (
+                  <a
+                    href={portfolio.socialLinks.substack}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:text-zinc-900 dark:hover:text-white transition-colors"
+                    title="Substack"
+                  >
+                    <SubstackIcon className="w-4 h-4" />
+                  </a>
+                )}
+                {displayEmail && (
+                  <a
+                    href={`mailto:${displayEmail}`}
+                    className="hover:text-zinc-900 dark:hover:text-white transition-colors"
+                    title="Email"
+                  >
                     <Mail className="w-4 h-4" />
+                  </a>
+                )}
+                {portfolio.resumeUrl && portfolio.resumeUrl !== "#" && (
+                  <a
+                    href={portfolio.resumeUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:text-zinc-900 dark:hover:text-white transition-colors flex items-center gap-1 text-xs font-mono"
+                    title="Resume"
+                  >
+                    <FileText className="w-4 h-4 text-blue-500" />
+                    <span>Resume</span>
                   </a>
                 )}
               </div>
@@ -408,12 +465,12 @@ export default function TemplatePage() {
           )}
         </section>
 
-        {/* GitHub Repositories / Projects Section */}
+        {/* Custom Featured Projects & Repositories Section */}
         <section id="projects" className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-              <span>GitHub Projects & Repositories</span>
-              <span className="text-xs font-normal text-zinc-400">({repos.length})</span>
+              <FolderGit2 className="w-4 h-4 text-blue-500" />
+              <span>Projects & Repositories</span>
             </h2>
             {githubUser?.html_url && (
               <a
@@ -428,14 +485,52 @@ export default function TemplatePage() {
             )}
           </div>
 
-          {loading ? (
+          {/* Custom Saved Projects from Context */}
+          {portfolio.projects?.length > 0 && (
             <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-20 bg-zinc-100 dark:bg-zinc-900 rounded-xl animate-pulse" />
+              {portfolio.projects.map((proj) => (
+                <div
+                  key={proj.id}
+                  className="p-4 rounded-xl bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/20 hover:border-blue-500/40 transition-all"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                          {proj.name}
+                        </h3>
+                        {proj.language && (
+                          <span className="text-[10px] font-medium bg-blue-500/20 text-blue-600 dark:text-blue-300 px-2 py-0.5 rounded-full">
+                            {proj.language}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-zinc-600 dark:text-zinc-300">{proj.description}</p>
+                    </div>
+
+                    {proj.url && (
+                      <a
+                        href={proj.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 shrink-0"
+                      >
+                        <span>Link</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
-          ) : repos.length > 0 ? (
-            <div className="space-y-3">
+          )}
+
+          {/* GitHub API Repositories */}
+          {repos.length > 0 && (
+            <div className="space-y-3 pt-2">
+              <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                GitHub Repositories
+              </h3>
               {visibleRepos.map((repo) => (
                 <a
                   key={repo.id}
@@ -457,7 +552,7 @@ export default function TemplatePage() {
                         )}
                       </div>
                       <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2">
-                        {repo.description || "No description provided for this repository."}
+                        {repo.description || "No description provided."}
                       </p>
                     </div>
 
@@ -475,39 +570,28 @@ export default function TemplatePage() {
                 </a>
               ))}
             </div>
-          ) : (
-            <div className="p-6 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 text-center text-xs text-zinc-400">
-              No public repositories found for this GitHub account.
-            </div>
-          )}
-
-          {repos.length > 3 && (
-            <div className="pt-1 text-center">
-              <button
-                onClick={() => setShowAllRepos(!showAllRepos)}
-                className="text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg px-4 py-1.5 transition-colors cursor-pointer"
-              >
-                {showAllRepos ? "Show less" : `Show all repositories (${repos.length})`}
-              </button>
-            </div>
           )}
         </section>
 
-        {/* GitHub Heatmap Section */}
+        {/* GitHub Heatmap Activity */}
         <section id="contributions">
           <GithubHeatmap username={currentUsername} isDarkMode={isDarkMode} />
         </section>
 
         {/* Experience Section */}
         <section id="work" className="space-y-4">
-          <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
-            Experience
+          <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+            <Briefcase className="w-4 h-4 text-blue-500" />
+            <span>Work Experience</span>
           </h2>
 
           <div className="space-y-4">
-            {visibleExperiences.map((exp, idx) => (
-              <div key={idx} className="flex flex-col sm:flex-row sm:items-start justify-between text-xs gap-1 sm:gap-4">
-                <div className="space-y-0.5">
+            {visibleExperiences.map((exp) => (
+              <div
+                key={exp.id}
+                className="p-4 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 flex flex-col sm:flex-row sm:items-start justify-between text-xs gap-2"
+              >
+                <div className="space-y-1">
                   <div className="flex items-center gap-2 font-bold text-zinc-900 dark:text-zinc-100 text-sm">
                     <span>{exp.company}</span>
                     {exp.status && (
@@ -517,66 +601,62 @@ export default function TemplatePage() {
                       </span>
                     )}
                   </div>
-                  <p className="text-zinc-500 dark:text-zinc-400">{exp.role}</p>
+                  <p className="text-zinc-600 dark:text-zinc-300 font-medium">{exp.role}</p>
+                  {exp.description && (
+                    <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed pt-1">{exp.description}</p>
+                  )}
                 </div>
 
-                <div className="text-right sm:text-right text-zinc-400 dark:text-zinc-500 text-[11px] space-y-0.5">
-                  <p className="font-medium text-zinc-500 dark:text-zinc-400">{exp.period}</p>
+                <div className="text-left sm:text-right text-zinc-400 dark:text-zinc-500 text-[11px] space-y-0.5 shrink-0">
+                  <p className="font-medium text-zinc-600 dark:text-zinc-300">{exp.period}</p>
                   <p>{exp.location}</p>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="pt-1 text-center">
-            <button
-              onClick={() => setShowAllExperience(!showAllExperience)}
-              className="text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg px-4 py-1.5 transition-colors cursor-pointer"
-            >
-              {showAllExperience ? "Show less" : "Show all work experiences"}
-            </button>
-          </div>
+          {experiences.length > 3 && (
+            <div className="pt-1 text-center">
+              <button
+                onClick={() => setShowAllExperience(!showAllExperience)}
+                className="text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg px-4 py-1.5 transition-colors cursor-pointer"
+              >
+                {showAllExperience ? "Show less" : `Show all work experiences (${experiences.length})`}
+              </button>
+            </div>
+          )}
         </section>
 
-        {/* Development Section */}
+        {/* Skills & Tech Stack Section */}
         <section className="space-y-4">
-          <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
-            Development & Gear
+          <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+            <Code2 className="w-4 h-4 text-blue-500" />
+            <span>Skills & Technologies</span>
           </h2>
 
-          <div className="space-y-3">
-            <div className="p-4 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
-              <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
-                Gears & Tech Stack
-              </h3>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                React, Next.js, TypeScript, Node.js, Tailwind CSS, PostgreSQL, Docker, Git.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
-              <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
-                Terminal & Environment
-              </h3>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                Zsh, Starship Prompt, VSCode / Cursor with GitHub Copilot & Antigravity.
-              </p>
+          <div className="p-5 rounded-2xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 space-y-3">
+            <div className="flex flex-wrap gap-2">
+              {portfolio.skills?.map((skill) => (
+                <span
+                  key={skill}
+                  className="px-3 py-1.5 rounded-xl bg-zinc-200/60 dark:bg-zinc-800/80 border border-zinc-300/60 dark:border-zinc-700/60 text-xs font-medium text-zinc-800 dark:text-zinc-200"
+                >
+                  {skill}
+                </span>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* Quote Section */}
-        <section className="p-6 rounded-2xl bg-zinc-100/60 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/60 text-center space-y-2 relative overflow-hidden">
-          <span className="absolute top-2 left-4 text-5xl opacity-10 text-zinc-400 font-serif select-none">
-            “
-          </span>
-          <p className="font-mono italic text-xs text-zinc-700 dark:text-zinc-300 relative z-10">
-            &quot;Code is like humor. When you have to explain it, it&apos;s bad.&quot;
-          </p>
-          <p className="font-mono text-[11px] text-zinc-400 dark:text-zinc-500 relative z-10">
-            — Cory House
-          </p>
-        </section>
+        {/* About Summary Section */}
+        {displayAbout && (
+          <section className="p-6 rounded-2xl bg-zinc-100/60 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/60 space-y-2">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">About Me</h3>
+            <p className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">
+              {displayAbout}
+            </p>
+          </section>
+        )}
 
         {/* Footer Section */}
         <footer className="pt-8 border-t border-zinc-200 dark:border-zinc-800 flex flex-col gap-6 text-xs text-zinc-500 dark:text-zinc-400">
@@ -587,10 +667,10 @@ export default function TemplatePage() {
                 NAVIGATE
               </h4>
               <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
-                <Link href="#home" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Home</Link>
+                <Link href="/" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Home</Link>
+                <Link href="/dashboard" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Dashboard</Link>
                 <Link href="#projects" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Projects</Link>
                 <Link href="#work" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Experience</Link>
-                <Link href="#resume" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Resume</Link>
               </div>
             </div>
 
@@ -600,21 +680,37 @@ export default function TemplatePage() {
                 CONNECT
               </h4>
               <div className="flex sm:justify-end gap-3 text-zinc-500 dark:text-zinc-400">
-                {githubUser?.html_url && (
-                  <a href={githubUser.html_url} target="_blank" rel="noreferrer" className="hover:text-zinc-900 dark:hover:text-white">
+                {(portfolio.socialLinks?.github || githubUser?.html_url) && (
+                  <a href={portfolio.socialLinks?.github || githubUser?.html_url} target="_blank" rel="noreferrer" className="hover:text-zinc-900 dark:hover:text-white">
                     <GithubIcon className="w-3.5 h-3.5" />
                   </a>
                 )}
-                <a href="https://x.com" target="_blank" rel="noreferrer" className="hover:text-zinc-900 dark:hover:text-white"><XIcon className="w-3.5 h-3.5" /></a>
-                <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="hover:text-zinc-900 dark:hover:text-white"><LinkedinIcon className="w-3.5 h-3.5" /></a>
-                <a href="https://youtube.com" target="_blank" rel="noreferrer" className="hover:text-zinc-900 dark:hover:text-white"><YoutubeIcon className="w-3.5 h-3.5" /></a>
-                <a href="https://instagram.com" target="_blank" rel="noreferrer" className="hover:text-zinc-900 dark:hover:text-white"><InstagramIcon className="w-3.5 h-3.5" /></a>
+                {portfolio.socialLinks?.twitter && (
+                  <a href={portfolio.socialLinks.twitter} target="_blank" rel="noreferrer" className="hover:text-zinc-900 dark:hover:text-white">
+                    <XIcon className="w-3.5 h-3.5" />
+                  </a>
+                )}
+                {portfolio.socialLinks?.linkedin && (
+                  <a href={portfolio.socialLinks.linkedin} target="_blank" rel="noreferrer" className="hover:text-zinc-900 dark:hover:text-white">
+                    <LinkedinIcon className="w-3.5 h-3.5" />
+                  </a>
+                )}
+                {portfolio.socialLinks?.youtube && (
+                  <a href={portfolio.socialLinks.youtube} target="_blank" rel="noreferrer" className="hover:text-zinc-900 dark:hover:text-white">
+                    <YoutubeIcon className="w-3.5 h-3.5" />
+                  </a>
+                )}
+                {portfolio.socialLinks?.instagram && (
+                  <a href={portfolio.socialLinks.instagram} target="_blank" rel="noreferrer" className="hover:text-zinc-900 dark:hover:text-white">
+                    <InstagramIcon className="w-3.5 h-3.5" />
+                  </a>
+                )}
               </div>
             </div>
           </div>
 
           <div className="pt-2 text-center sm:text-left text-[11px] text-zinc-400 dark:text-zinc-500">
-            © {new Date().getFullYear()} {githubUser?.name || currentUsername}. All rights reserved.
+            © {new Date().getFullYear()} {displayName}. All rights reserved.
           </div>
         </footer>
       </div>
@@ -665,5 +761,22 @@ export default function TemplatePage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function TemplatePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-zinc-100 font-mono text-xs">
+          <div className="flex items-center gap-2">
+            <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+            <span>Loading template profile...</span>
+          </div>
+        </div>
+      }
+    >
+      <TemplateContent />
+    </Suspense>
   );
 }
