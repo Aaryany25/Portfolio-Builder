@@ -216,6 +216,7 @@ function TemplateContent() {
     <div className={`min-h-screen ${isDarkMode ? "dark bg-zinc-950 text-zinc-100" : "bg-[#fcfbf9] text-zinc-900"} font-sans transition-colors duration-200 selection:bg-zinc-800 selection:text-white dark:selection:bg-zinc-200 dark:selection:text-zinc-900 pb-16`}>
       {/* Outer Centered Container */}
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-10">
+        
         {/* Top Header / Navigation */}
         <header className="flex items-center justify-between text-sm text-zinc-500 dark:text-zinc-400">
           <nav className="flex items-center gap-4 sm:gap-5 text-xs sm:text-sm">
@@ -267,7 +268,7 @@ function TemplateContent() {
         </header>
 
         {/* GitHub Username Switcher Bar */}
-        <form onSubmit={handleUserSearchSubmit} className="flex items-center gap-2 bg-zinc-100/80 dark:bg-zinc-900/80 p-2 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs">
+        {/* <form onSubmit={handleUserSearchSubmit} className="flex items-center gap-2 bg-zinc-100/80 dark:bg-zinc-900/80 p-2 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs">
           <div className="flex items-center gap-2 text-zinc-400 pl-2 text-xs font-mono">
             <GithubIcon className="w-4 h-4 text-zinc-600 dark:text-zinc-300" />
             <span>github.com/</span>
@@ -286,7 +287,7 @@ function TemplateContent() {
             {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
             <span>Fetch Data</span>
           </button>
-        </form>
+        </form> */}
 
         {/* Error Notification Banner */}
         {error && (
@@ -308,9 +309,7 @@ function TemplateContent() {
             <>
               {/* Avatar */}
               <div className="relative w-fit">
-                <div className="absolute -top-6 left-6 text-base animate-bounce select-none">
-                  ⚡
-                </div>
+               
                 <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-zinc-200 dark:border-zinc-800 shadow-sm bg-zinc-100 dark:bg-zinc-900">
                   <Image
                     src={displayAvatar}
@@ -328,7 +327,7 @@ function TemplateContent() {
                 <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
                   {displayName}
                 </h1>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono flex flex-wrap items-center gap-1.5">
+                <p className="text-sm  text-zinc-500 dark:text-zinc-400 font-mono flex flex-wrap items-center gap-1.5">
                   <span>@{githubUser?.login || currentUsername}</span>
                   <span>·</span>
                   <span className="inline-flex items-center gap-1">
@@ -349,30 +348,21 @@ function TemplateContent() {
                     </>
                   )}
                 </p>
-                <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 pt-0.5">
+                <p className="text-xl font-semibold text-slate-800 dark:text-blue-400 pt-0.5">
                   {displayTagline}
                 </p>
               </div>
 
               {/* Bio Line */}
-              <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+              <p className="text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed">
                 {displayBio}
               </p>
 
               {/* Live GitHub Stats Pill */}
-              <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400 bg-zinc-100/70 dark:bg-zinc-900/70 border border-zinc-200/80 dark:border-zinc-800/80 px-3.5 py-1.5 rounded-full w-fit">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                <span className="text-zinc-500 dark:text-zinc-400">Live Data —</span>
-                <span className="font-medium text-zinc-800 dark:text-zinc-200">
-                  {githubUser?.public_repos || repos.length} Repositories · {githubUser?.followers || 0} Followers
-                </span>
-              </div>
+             
 
               {/* Social Icons Strip */}
-              <div className="flex items-center gap-3.5 pt-1 text-zinc-500 dark:text-zinc-400">
+              <div className="flex items-center gap-3.5 pt-1 text-zinc-500 dark:text-zinc-400 ">
                 {(portfolio.socialLinks?.github || githubUser?.html_url) && (
                   <a
                     href={portfolio.socialLinks?.github || githubUser?.html_url}
@@ -381,7 +371,7 @@ function TemplateContent() {
                     className="hover:text-zinc-900 dark:hover:text-white transition-colors"
                     title="GitHub Profile"
                   >
-                    <GithubIcon className="w-4 h-4" />
+                    <GithubIcon className="w-6 h-6" />
                   </a>
                 )}
                 {portfolio.socialLinks?.twitter && (
@@ -392,7 +382,7 @@ function TemplateContent() {
                     className="hover:text-zinc-900 dark:hover:text-white transition-colors"
                     title="X / Twitter"
                   >
-                    <XIcon className="w-4 h-4" />
+                    <XIcon className="w-6 h-6" />
                   </a>
                 )}
                 {portfolio.socialLinks?.linkedin && (
@@ -403,63 +393,22 @@ function TemplateContent() {
                     className="hover:text-zinc-900 dark:hover:text-white transition-colors"
                     title="LinkedIn"
                   >
-                    <LinkedinIcon className="w-4 h-4" />
+                    <LinkedinIcon className="w-6 h-6" />
                   </a>
                 )}
-                {portfolio.socialLinks?.youtube && (
-                  <a
-                    href={portfolio.socialLinks.youtube}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="hover:text-zinc-900 dark:hover:text-white transition-colors"
-                    title="YouTube"
-                  >
-                    <YoutubeIcon className="w-4 h-4" />
-                  </a>
-                )}
-                {portfolio.socialLinks?.instagram && (
-                  <a
-                    href={portfolio.socialLinks.instagram}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="hover:text-zinc-900 dark:hover:text-white transition-colors"
-                    title="Instagram"
-                  >
-                    <InstagramIcon className="w-4 h-4" />
-                  </a>
-                )}
-                {portfolio.socialLinks?.substack && (
-                  <a
-                    href={portfolio.socialLinks.substack}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="hover:text-zinc-900 dark:hover:text-white transition-colors"
-                    title="Substack"
-                  >
-                    <SubstackIcon className="w-4 h-4" />
-                  </a>
-                )}
+                
+               
+                
                 {displayEmail && (
                   <a
                     href={`mailto:${displayEmail}`}
                     className="hover:text-zinc-900 dark:hover:text-white transition-colors"
                     title="Email"
                   >
-                    <Mail className="w-4 h-4" />
+                    <Mail className="w-6 h-6" />
                   </a>
                 )}
-                {portfolio.resumeUrl && portfolio.resumeUrl !== "#" && (
-                  <a
-                    href={portfolio.resumeUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="hover:text-zinc-900 dark:hover:text-white transition-colors flex items-center gap-1 text-xs font-mono"
-                    title="Resume"
-                  >
-                    <FileText className="w-4 h-4 text-blue-500" />
-                    <span>Resume</span>
-                  </a>
-                )}
+               
               </div>
             </>
           )}
@@ -537,12 +486,12 @@ function TemplateContent() {
                   href={repo.html_url}
                   target="_blank"
                   rel="noreferrer"
-                  className="block p-4 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-blue-500/50 dark:hover:border-blue-500/50 transition-all group"
+                  className="block shadow-lg p-4 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-slate-500/50 dark:hover:border-blue-500/50 transition-all group"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-slate-800 dark:group-hover:text-blue-400 transition-colors">
                           {repo.name}
                         </h3>
                         {repo.language && (

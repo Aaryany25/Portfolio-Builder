@@ -39,29 +39,21 @@ export default function GithubHeatmap({ username, isDarkMode = false }: GithubHe
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-          <GithubIcon className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
+          {/* <GithubIcon className="w-4 h-4 text-zinc-700 dark:text-zinc-300" /> */}
           <span>GitHub Contributions</span>
         </h2>
-        <a
-          href={`https://github.com/${cleanUsername}`}
-          target="_blank"
-          rel="noreferrer"
-          className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 font-medium"
-        >
-          <span>@{cleanUsername}</span>
-          <ExternalLink className="w-3 h-3" />
-        </a>
+     
       </div>
 
-      <div className="p-4 sm:p-5 rounded-2xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 transition-all shadow-xs overflow-hidden">
+      <div className="p-4 sm:p-5 rounded-lg bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 transition-all shadow-lg overflow-hidden">
         <div className="flex justify-center overflow-x-auto py-2">
           {mounted ? (
             <GitHubCalendar
               username={cleanUsername}
               colorScheme={isDarkMode ? "dark" : "light"}
               theme={theme}
-              blockSize={12}
-              blockMargin={4}
+              blockSize={9}
+              blockMargin={2}
               fontSize={12}
               labels={{
                 totalCount: "{{count}} contributions in the last year",
