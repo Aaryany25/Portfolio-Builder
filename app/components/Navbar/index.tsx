@@ -23,14 +23,14 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand / Logo */}
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-2.5 group">
+          {/* <Link href="/" className="flex items-center gap-2.5 group">
             <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
               <Sparkles className="w-5 h-5" />
             </div>
             <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-600 dark:from-white dark:via-zinc-200 dark:to-zinc-400 bg-clip-text text-transparent">
               PortfolioBuilder
             </span>
-          </Link>
+          </Link> */}
 
           <nav className="hidden sm:flex items-center gap-4 text-xs font-medium text-zinc-600 dark:text-zinc-400">
             <Link href="/dashboard" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
@@ -48,7 +48,7 @@ export default function Navbar() {
             <div className="h-9 w-28 bg-zinc-200 dark:bg-zinc-800 animate-pulse rounded-lg" />
           ) : session?.user ? (
             <div className="flex items-center gap-3 bg-zinc-100 dark:bg-zinc-800/80 p-1.5 pl-3 rounded-full border border-zinc-200/80 dark:border-zinc-700/60 shadow-sm">
-              <div className="flex items-center gap-2.5">
+              {/* <div className="flex items-center gap-2.5">
                 {session.user.image ? (
                   <Image
                     src={session.user.image}
@@ -73,7 +73,7 @@ export default function Navbar() {
                     </span>
                   )}
                 </div>
-              </div>
+              </div> */}
 
               <Button
                 variant="ghost"

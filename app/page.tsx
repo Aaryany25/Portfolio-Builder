@@ -42,6 +42,7 @@ export default function Home() {
           </p>
  <Button
                 size="lg"
+                variant="outline"
                 // onClick={() => signIn("github")}
                 className="w-full sm:w-auto h-12 px-8 rounded-full bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-semibold shadow-lg transition-all flex items-center justify-center gap-3 text-base"
               >
@@ -52,7 +53,7 @@ export default function Home() {
                 {/* <span>View Templates</span> */}
                 <ArrowRight className="w-4 h-4 ml-1" />
               </Button>
-          {!session && (
+          {/* {!session && (
             <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 w-full sm:w-auto">
               <Button
                 size="lg"
@@ -64,7 +65,7 @@ export default function Home() {
                 <ArrowRight className="w-4 h-4 ml-1" />
               </Button>
             </div>
-          )}
+          )} */}
         </div>
       </main>
     </div>

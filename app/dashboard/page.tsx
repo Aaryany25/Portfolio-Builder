@@ -23,6 +23,8 @@ import {
   CheckCircle2,
   AlertCircle,
   Loader2,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 function GithubIcon({ className = "w-4 h-4" }: { className?: string }) {
@@ -36,6 +38,9 @@ function GithubIcon({ className = "w-4 h-4" }: { className?: string }) {
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const { portfolio, updatePortfolio, savePortfolio, saving, resetToDefault, loading } = usePortfolio();
+
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const isDark = theme === "dark";
 
   const [activeTab, setActiveTab] = useState<"profile" | "experience" | "projects" | "skills" | "socials">("profile");
   const [newSkill, setNewSkill] = useState("");
@@ -137,46 +142,74 @@ export default function DashboardPage() {
     });
   };
 
+  // Common styling helpers for light / dark mode
+  const panelClass = isDark
+    ? "bg-zinc-900/80 p-6 sm:p-8 rounded-lg border border-zinc-800"
+    : "bg-white p-6 sm:p-8 rounded-lg border border-slate-200/90 shadow-sm";
+
+  const inputClass = `w-full rounded-md px-4 py-2.5 text-xs transition-all focus:outline-none ${
+    isDark
+      ? "bg-zinc-950 border border-zinc-800 text-white placeholder-zinc-500 focus:border-blue-500"
+      : "bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20"
+  }`;
+
+  const labelClass = `block text-xs font-medium mb-1.5 ${
+    isDark ? "text-zinc-400" : "text-slate-700"
+  }`;
+
+  const sectionTitleClass = `text-base font-semibold flex items-center gap-2 ${
+    isDark ? "text-white" : "text-slate-900"
+  }`;
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-zinc-100">
+      <div className={`min-h-screen flex items-center justify-center transition-colors ${isDark ? "bg-zinc-950 text-zinc-100" : "bg-slate-50 text-slate-900"}`}>
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-          <p className="text-sm text-zinc-400 font-mono">Loading user dashboard...</p>
+          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+          <p className={`text-sm font-mono ${isDark ? "text-zinc-400" : "text-slate-500"}`}>Loading user dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-blue-600 selection:text-white pb-20">
+    <div className={`min-h-screen font-sans selection:bg-blue-600 selection:text-white pb-20 transition-colors duration-200 ${isDark ? "bg-zinc-950 text-zinc-100" : "bg-slate-50 text-slate-900"}`}>
       {/* Top Banner & Header */}
-      <header className="sticky top-0 z-40 bg-zinc-900/80 backdrop-blur-xl border-b border-zinc-800 px-4 sm:px-8 py-4">
+      <header className={`sticky top-0 z-40 backdrop-blur-xl px-4 sm:px-8 py-4 transition-colors ${isDark ? "bg-zinc-900/80 border-b border-zinc-800" : "bg-white/80 border-b border-slate-200 shadow-xs"}`}>
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <Link
               href="/"
-              className="p-2 rounded-xl bg-zinc-800/80 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors"
+              className={`p-2 rounded-md transition-colors ${isDark ? "bg-zinc-800/80 hover:bg-zinc-800 text-zinc-400 hover:text-white" : "bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 border border-slate-200/60"}`}
               title="Back to Home"
             >
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold tracking-tight">User Dashboard</h1>
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                <h1 className={`text-xl font-bold tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>User Dashboard</h1>
+                <span className={`px-2.5 py-0.5 rounded-md text-[11px] font-semibold border ${isDark ? "bg-blue-500/10 text-blue-400 border-blue-500/20" : "bg-blue-50 text-blue-600 border-blue-200"}`}>
                   Live Portfolio Editor
                 </span>
               </div>
-              <p className="text-xs text-zinc-400">Manage and persist your portfolio information</p>
+              <p className={`text-xs ${isDark ? "text-zinc-400" : "text-slate-500"}`}>Manage and persist your portfolio information</p>
             </div>
           </div>
 
           {/* Header Action Buttons */}
           <div className="flex items-center gap-3">
             <button
+              onClick={() => setTheme(isDark ? "light" : "dark")}
+              className={`px-3 py-2 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer border ${isDark ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border-zinc-700" : "bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200"}`}
+              title="Toggle Theme Mode"
+            >
+              {isDark ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-slate-700" />}
+              <span>{isDark ? "Light Mode" : "Dark Mode"}</span>
+            </button>
+
+            <button
               onClick={resetToDefault}
-              className="px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
+              className={`px-3 py-2 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer border ${isDark ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border-zinc-700" : "bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200"}`}
               title="Reset form fields to default template"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -186,16 +219,16 @@ export default function DashboardPage() {
             <Link
               href={`/Template?username=${encodeURIComponent(portfolio.githubUsername || portfolio.name)}`}
               target="_blank"
-              className="px-3.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white text-xs font-medium transition-colors flex items-center gap-1.5"
+              className={`px-3.5 py-2 rounded-md border text-xs font-medium transition-colors flex items-center gap-1.5 ${isDark ? "bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-white" : "bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-800"}`}
             >
-              <ExternalLink className="w-3.5 h-3.5 text-blue-400" />
+              <ExternalLink className="w-3.5 h-3.5 text-blue-500" />
               <span>View Template</span>
             </Link>
 
             <button
               onClick={handleSave}
               disabled={saving}
-              className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-600/30 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              className="px-5 py-2 rounded-md bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50 transition-colors"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               <span>{saving ? "Saving..." : "Save Changes"}</span>
@@ -208,14 +241,14 @@ export default function DashboardPage() {
       <main className="max-w-6xl mx-auto px-4 sm:px-8 mt-8">
         {/* Save Status Banners */}
         {saveSuccess && (
-          <div className="mb-6 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs sm:text-sm font-medium flex items-center justify-between shadow-lg">
+          <div className={`mb-6 p-4 rounded-lg text-xs sm:text-sm font-medium flex items-center justify-between shadow-sm border ${isDark ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" : "bg-emerald-50 border-emerald-200 text-emerald-800"}`}>
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+              <CheckCircle2 className={`w-5 h-5 flex-shrink-0 ${isDark ? "text-emerald-400" : "text-emerald-600"}`} />
               <span>Your portfolio details have been successfully saved and persisted!</span>
             </div>
             <Link
               href={`/Template?username=${encodeURIComponent(portfolio.githubUsername)}`}
-              className="underline hover:text-emerald-300 font-semibold ml-2"
+              className={`underline font-semibold ml-2 ${isDark ? "hover:text-emerald-300" : "text-emerald-700 hover:text-emerald-900"}`}
             >
               Open Template &rarr;
             </Link>
@@ -223,14 +256,14 @@ export default function DashboardPage() {
         )}
 
         {saveError && (
-          <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs sm:text-sm font-medium flex items-center gap-2">
-            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+          <div className={`mb-6 p-4 rounded-lg text-xs sm:text-sm font-medium flex items-center gap-2 border ${isDark ? "bg-red-500/10 border-red-500/30 text-red-400" : "bg-red-50 border-red-200 text-red-700"}`}>
+            <AlertCircle className={`w-5 h-5 flex-shrink-0 ${isDark ? "text-red-400" : "text-red-600"}`} />
             <span>{saveError}</span>
           </div>
         )}
 
         {/* Auth Status Card */}
-        <div className="mb-8 p-6 rounded-3xl bg-zinc-900 border border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
+        <div className={`mb-8 p-6 rounded-lg border flex flex-col sm:flex-row items-center justify-between gap-6 transition-colors ${isDark ? "bg-zinc-900 border-zinc-800 shadow-xl" : "bg-white border-slate-200/90 shadow-sm"}`}>
           <div className="flex items-center gap-4">
             {session?.user?.image ? (
               <Image
@@ -239,24 +272,24 @@ export default function DashboardPage() {
                 width={56}
                 height={56}
                 unoptimized
-                className="rounded-2xl ring-2 ring-blue-500/40 object-cover"
+                className="rounded-lg ring-2 ring-blue-500/40 object-cover"
               />
             ) : (
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-xl flex items-center justify-center">
+              <div className="w-14 h-14 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-xl flex items-center justify-center">
                 {portfolio.name?.[0] || "U"}
               </div>
             )}
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold text-white">{session?.user?.name || portfolio.name}</h2>
+                <h2 className={`text-lg font-bold ${isDark ? "text-white" : "text-slate-900"}`}>{session?.user?.name || portfolio.name}</h2>
                 {session?.user && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-semibold flex items-center gap-1 border ${isDark ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-emerald-50 text-emerald-700 border-emerald-200"}`}>
                     <CheckCircle2 className="w-3 h-3" />
                     GitHub Session Active
                   </span>
                 )}
               </div>
-              <p className="text-xs text-zinc-400 mt-0.5">
+              <p className={`text-xs mt-0.5 ${isDark ? "text-zinc-400" : "text-slate-500"}`}>
                 {session?.user?.email || portfolio.email || "Local user session"}
               </p>
             </div>
@@ -266,14 +299,14 @@ export default function DashboardPage() {
             {session?.user ? (
               <button
                 onClick={() => signOut()}
-                className="px-3.5 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white text-xs font-medium transition-colors"
+                className={`px-3.5 py-1.5 rounded-md text-xs font-medium transition-colors border ${isDark ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white border-zinc-700" : "bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 border-slate-200"}`}
               >
                 Sign Out
               </button>
             ) : (
               <button
                 onClick={() => signIn("github")}
-                className="px-4 py-2 rounded-xl bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-semibold transition-colors flex items-center gap-2"
+                className={`px-4 py-2 rounded-md text-xs font-semibold transition-colors flex items-center gap-2 ${isDark ? "bg-white hover:bg-zinc-200 text-zinc-950" : "bg-slate-900 hover:bg-slate-800 text-white shadow-xs"}`}
               >
                 <GithubIcon className="w-4 h-4" />
                 <span>Connect GitHub Account</span>
@@ -283,13 +316,15 @@ export default function DashboardPage() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 border-b border-zinc-800 pb-3 mb-8 overflow-x-auto">
+        <div className={`flex items-center gap-2 border-b pb-3 mb-8 overflow-x-auto ${isDark ? "border-zinc-800" : "border-slate-200"}`}>
           <button
             onClick={() => setActiveTab("profile")}
-            className={`px-4 py-2 rounded-xl text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-4 py-2 rounded-md text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeTab === "profile"
                 ? "bg-blue-600 text-white shadow-md shadow-blue-600/20"
-                : "bg-zinc-900/60 text-zinc-400 hover:text-white hover:bg-zinc-800"
+                : isDark
+                ? "bg-zinc-900/60 text-zinc-400 hover:text-white hover:bg-zinc-800"
+                : "bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200/80 border border-slate-200/60"
             }`}
           >
             <User className="w-4 h-4" />
@@ -298,10 +333,12 @@ export default function DashboardPage() {
 
           <button
             onClick={() => setActiveTab("experience")}
-            className={`px-4 py-2 rounded-xl text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-4 py-2 rounded-md text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeTab === "experience"
                 ? "bg-blue-600 text-white shadow-md shadow-blue-600/20"
-                : "bg-zinc-900/60 text-zinc-400 hover:text-white hover:bg-zinc-800"
+                : isDark
+                ? "bg-zinc-900/60 text-zinc-400 hover:text-white hover:bg-zinc-800"
+                : "bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200/80 border border-slate-200/60"
             }`}
           >
             <Briefcase className="w-4 h-4" />
@@ -310,10 +347,12 @@ export default function DashboardPage() {
 
           <button
             onClick={() => setActiveTab("projects")}
-            className={`px-4 py-2 rounded-xl text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-4 py-2 rounded-md text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeTab === "projects"
                 ? "bg-blue-600 text-white shadow-md shadow-blue-600/20"
-                : "bg-zinc-900/60 text-zinc-400 hover:text-white hover:bg-zinc-800"
+                : isDark
+                ? "bg-zinc-900/60 text-zinc-400 hover:text-white hover:bg-zinc-800"
+                : "bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200/80 border border-slate-200/60"
             }`}
           >
             <FolderGit2 className="w-4 h-4" />
@@ -322,10 +361,12 @@ export default function DashboardPage() {
 
           <button
             onClick={() => setActiveTab("skills")}
-            className={`px-4 py-2 rounded-xl text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-4 py-2 rounded-md text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeTab === "skills"
                 ? "bg-blue-600 text-white shadow-md shadow-blue-600/20"
-                : "bg-zinc-900/60 text-zinc-400 hover:text-white hover:bg-zinc-800"
+                : isDark
+                ? "bg-zinc-900/60 text-zinc-400 hover:text-white hover:bg-zinc-800"
+                : "bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200/80 border border-slate-200/60"
             }`}
           >
             <Code2 className="w-4 h-4" />
@@ -334,10 +375,12 @@ export default function DashboardPage() {
 
           <button
             onClick={() => setActiveTab("socials")}
-            className={`px-4 py-2 rounded-xl text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-4 py-2 rounded-md text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeTab === "socials"
                 ? "bg-blue-600 text-white shadow-md shadow-blue-600/20"
-                : "bg-zinc-900/60 text-zinc-400 hover:text-white hover:bg-zinc-800"
+                : isDark
+                ? "bg-zinc-900/60 text-zinc-400 hover:text-white hover:bg-zinc-800"
+                : "bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200/80 border border-slate-200/60"
             }`}
           >
             <Share2 className="w-4 h-4" />
@@ -347,109 +390,109 @@ export default function DashboardPage() {
 
         {/* Tab 1: Personal Profile */}
         {activeTab === "profile" && (
-          <div className="space-y-6 bg-zinc-900/80 p-6 sm:p-8 rounded-3xl border border-zinc-800">
-            <h3 className="text-base font-semibold text-white flex items-center gap-2">
-              <User className="w-4 h-4 text-blue-400" />
+          <div className={`space-y-6 ${panelClass}`}>
+            <h3 className={sectionTitleClass}>
+              <User className="w-4 h-4 text-blue-500" />
               <span>Personal Information</span>
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">Full Name</label>
+                <label className={labelClass}>Full Name</label>
                 <input
                   type="text"
                   value={portfolio.name || ""}
                   onChange={(e) => updatePortfolio({ name: e.target.value })}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
+                  className={inputClass}
                   placeholder="e.g. Aaryan Parmar"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">Headline / Tagline</label>
+                <label className={labelClass}>Headline / Tagline</label>
                 <input
                   type="text"
                   value={portfolio.tagline || ""}
                   onChange={(e) => updatePortfolio({ tagline: e.target.value })}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
+                  className={inputClass}
                   placeholder="e.g. Full Stack Engineer & Open Source Enthusiast"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">GitHub Username (for Repos & Heatmap)</label>
+                <label className={labelClass}>GitHub Username (for Repos & Heatmap)</label>
                 <input
                   type="text"
                   value={portfolio.githubUsername || ""}
                   onChange={(e) => updatePortfolio({ githubUsername: e.target.value.trim() })}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500 font-mono"
+                  className={`${inputClass} font-mono`}
                   placeholder="e.g. Aaryany25"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">Email Address</label>
+                <label className={labelClass}>Email Address</label>
                 <input
                   type="email"
                   value={portfolio.email || ""}
                   onChange={(e) => updatePortfolio({ email: e.target.value })}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
+                  className={inputClass}
                   placeholder="e.g. dev@example.com"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">Location</label>
+                <label className={labelClass}>Location</label>
                 <input
                   type="text"
                   value={portfolio.location || ""}
                   onChange={(e) => updatePortfolio({ location: e.target.value })}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
+                  className={inputClass}
                   placeholder="e.g. Hyderabad, India"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">Avatar Image URL</label>
+                <label className={labelClass}>Avatar Image URL</label>
                 <input
                   type="text"
                   value={portfolio.avatarUrl || ""}
                   onChange={(e) => updatePortfolio({ avatarUrl: e.target.value })}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500 font-mono"
+                  className={`${inputClass} font-mono`}
                   placeholder="https://..."
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-zinc-400 mb-1.5">Short Bio (Hero section)</label>
+              <label className={labelClass}>Short Bio (Hero section)</label>
               <input
                 type="text"
                 value={portfolio.bio || ""}
                 onChange={(e) => updatePortfolio({ bio: e.target.value })}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
+                className={inputClass}
                 placeholder="Short bio summary..."
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-zinc-400 mb-1.5">About Me (Detailed description)</label>
+              <label className={labelClass}>About Me (Detailed description)</label>
               <textarea
                 rows={4}
                 value={portfolio.about || ""}
                 onChange={(e) => updatePortfolio({ about: e.target.value })}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500 leading-relaxed"
+                className={`${inputClass} p-4 leading-relaxed`}
                 placeholder="Write a detailed introduction about your background and interests..."
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-zinc-400 mb-1.5">Resume / CV Link</label>
+              <label className={labelClass}>Resume / CV Link</label>
               <input
                 type="text"
                 value={portfolio.resumeUrl || ""}
                 onChange={(e) => updatePortfolio({ resumeUrl: e.target.value })}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
+                className={inputClass}
                 placeholder="https://..."
               />
             </div>
@@ -460,9 +503,9 @@ export default function DashboardPage() {
         {activeTab === "experience" && (
           <div className="space-y-8">
             {/* Add Experience Form */}
-            <form onSubmit={handleAddExperience} className="bg-zinc-900/80 p-6 sm:p-8 rounded-3xl border border-zinc-800 space-y-4">
-              <h3 className="text-base font-semibold text-white flex items-center gap-2">
-                <Plus className="w-4 h-4 text-blue-400" />
+            <form onSubmit={handleAddExperience} className={`${panelClass} space-y-4`}>
+              <h3 className={sectionTitleClass}>
+                <Plus className="w-4 h-4 text-blue-500" />
                 <span>Add Work Experience</span>
               </h3>
 
@@ -472,7 +515,7 @@ export default function DashboardPage() {
                   placeholder="Company Name (e.g. Google)"
                   value={newExp.company || ""}
                   onChange={(e) => setNewExp({ ...newExp, company: e.target.value })}
-                  className="bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
+                  className={inputClass}
                   required
                 />
                 <input
@@ -480,7 +523,7 @@ export default function DashboardPage() {
                   placeholder="Role / Title (e.g. Senior Frontend Engineer)"
                   value={newExp.role || ""}
                   onChange={(e) => setNewExp({ ...newExp, role: e.target.value })}
-                  className="bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
+                  className={inputClass}
                   required
                 />
                 <input
@@ -488,14 +531,14 @@ export default function DashboardPage() {
                   placeholder="Period (e.g. Jan 2025 - Present)"
                   value={newExp.period || ""}
                   onChange={(e) => setNewExp({ ...newExp, period: e.target.value })}
-                  className="bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
+                  className={inputClass}
                 />
                 <input
                   type="text"
                   placeholder="Location (e.g. Remote / On-Site)"
                   value={newExp.location || ""}
                   onChange={(e) => setNewExp({ ...newExp, location: e.target.value })}
-                  className="bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
+                  className={inputClass}
                 />
               </div>
 
@@ -504,12 +547,12 @@ export default function DashboardPage() {
                 placeholder="Short description of your responsibilities and achievements..."
                 value={newExp.description || ""}
                 onChange={(e) => setNewExp({ ...newExp, description: e.target.value })}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-blue-500"
+                className={`${inputClass} p-3`}
               />
 
               <button
                 type="submit"
-                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add Experience Entry</span>
@@ -518,41 +561,51 @@ export default function DashboardPage() {
 
             {/* List Existing Experiences */}
             <div className="space-y-4">
-              <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+              <h4 className={`text-xs font-semibold uppercase tracking-wider ${isDark ? "text-zinc-400" : "text-slate-500"}`}>
                 Current Work Experiences ({portfolio.experiences?.length || 0})
               </h4>
 
               {portfolio.experiences?.length === 0 ? (
-                <div className="p-8 text-center bg-zinc-900/40 rounded-3xl border border-zinc-800 text-zinc-500 text-xs">
+                <div className={`p-8 text-center rounded-lg text-xs border ${isDark ? "bg-zinc-900/40 border-zinc-800 text-zinc-500" : "bg-slate-50/70 border-slate-200 text-slate-500"}`}>
                   No work experiences added yet. Fill out the form above to add your history.
                 </div>
               ) : (
                 portfolio.experiences?.map((exp) => (
                   <div
                     key={exp.id}
-                    className="p-5 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-start justify-between gap-4"
+                    className={`p-5 rounded-lg border flex items-start justify-between gap-4 transition-colors ${
+                      isDark ? "bg-zinc-900 border-zinc-800" : "bg-white border-slate-200/90 shadow-xs"
+                    }`}
                   >
                     <div className="space-y-1 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-white text-sm">{exp.company}</span>
+                        <span className={`font-bold text-sm ${isDark ? "text-white" : "text-slate-900"}`}>{exp.company}</span>
                         {exp.status && (
-                          <span className="px-2 py-0.5 text-[10px] font-semibold bg-blue-500/10 text-blue-400 rounded-full border border-blue-500/20">
+                          <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-md border ${
+                            isDark
+                              ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                              : "bg-blue-50 text-blue-600 border-blue-200"
+                          }`}>
                             {exp.status}
                           </span>
                         )}
                       </div>
-                      <p className="text-xs font-medium text-zinc-300">{exp.role}</p>
-                      <p className="text-[11px] text-zinc-500">
+                      <p className={`text-xs font-medium ${isDark ? "text-zinc-300" : "text-slate-700"}`}>{exp.role}</p>
+                      <p className={`text-[11px] ${isDark ? "text-zinc-500" : "text-slate-400"}`}>
                         {exp.period} &bull; {exp.location}
                       </p>
                       {exp.description && (
-                        <p className="text-xs text-zinc-400 pt-1 leading-relaxed">{exp.description}</p>
+                        <p className={`text-xs pt-1 leading-relaxed ${isDark ? "text-zinc-400" : "text-slate-600"}`}>{exp.description}</p>
                       )}
                     </div>
 
                     <button
                       onClick={() => handleRemoveExperience(exp.id)}
-                      className="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors cursor-pointer"
+                      className={`p-2 rounded-md transition-colors cursor-pointer border ${
+                        isDark
+                          ? "bg-red-500/10 hover:bg-red-500/20 text-red-400 border-red-500/20"
+                          : "bg-red-50 hover:bg-red-100 text-red-600 border-red-200/60"
+                      }`}
                       title="Remove experience"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -568,9 +621,9 @@ export default function DashboardPage() {
         {activeTab === "projects" && (
           <div className="space-y-8">
             {/* Add Project Form */}
-            <form onSubmit={handleAddProject} className="bg-zinc-900/80 p-6 sm:p-8 rounded-3xl border border-zinc-800 space-y-4">
-              <h3 className="text-base font-semibold text-white flex items-center gap-2">
-                <Plus className="w-4 h-4 text-blue-400" />
+            <form onSubmit={handleAddProject} className={`${panelClass} space-y-4`}>
+              <h3 className={sectionTitleClass}>
+                <Plus className="w-4 h-4 text-blue-500" />
                 <span>Add Featured Project</span>
               </h3>
 
@@ -580,7 +633,7 @@ export default function DashboardPage() {
                   placeholder="Project Name"
                   value={newProj.name || ""}
                   onChange={(e) => setNewProj({ ...newProj, name: e.target.value })}
-                  className="bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
+                  className={inputClass}
                   required
                 />
                 <input
@@ -588,7 +641,7 @@ export default function DashboardPage() {
                   placeholder="Project / Repository URL"
                   value={newProj.url || ""}
                   onChange={(e) => setNewProj({ ...newProj, url: e.target.value })}
-                  className="bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
+                  className={inputClass}
                 />
               </div>
 
@@ -597,13 +650,13 @@ export default function DashboardPage() {
                 placeholder="Project description..."
                 value={newProj.description || ""}
                 onChange={(e) => setNewProj({ ...newProj, description: e.target.value })}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-blue-500"
+                className={`${inputClass} p-3`}
                 required
               />
 
               <button
                 type="submit"
-                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add Project Entry</span>
@@ -612,36 +665,42 @@ export default function DashboardPage() {
 
             {/* List Existing Projects */}
             <div className="space-y-4">
-              <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+              <h4 className={`text-xs font-semibold uppercase tracking-wider ${isDark ? "text-zinc-400" : "text-slate-500"}`}>
                 Current Projects ({portfolio.projects?.length || 0})
               </h4>
 
               {portfolio.projects?.length === 0 ? (
-                <div className="p-8 text-center bg-zinc-900/40 rounded-3xl border border-zinc-800 text-zinc-500 text-xs">
+                <div className={`p-8 text-center rounded-lg text-xs border ${isDark ? "bg-zinc-900/40 border-zinc-800 text-zinc-500" : "bg-slate-50/70 border-slate-200 text-slate-500"}`}>
                   No custom projects added yet.
                 </div>
               ) : (
                 portfolio.projects?.map((proj) => (
                   <div
                     key={proj.id}
-                    className="p-5 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-start justify-between gap-4"
+                    className={`p-5 rounded-lg border flex items-start justify-between gap-4 transition-colors ${
+                      isDark ? "bg-zinc-900 border-zinc-800" : "bg-white border-slate-200/90 shadow-xs"
+                    }`}
                   >
                     <div className="space-y-1 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-white text-sm">{proj.name}</span>
+                        <span className={`font-bold text-sm ${isDark ? "text-white" : "text-slate-900"}`}>{proj.name}</span>
                         {proj.language && (
-                          <span className="px-2 py-0.5 text-[10px] font-mono bg-zinc-800 text-zinc-300 rounded-md">
+                          <span className={`px-2 py-0.5 text-[10px] font-mono rounded-md ${
+                            isDark ? "bg-zinc-800 text-zinc-300" : "bg-slate-100 text-slate-700 border border-slate-200"
+                          }`}>
                             {proj.language}
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-zinc-400 leading-relaxed">{proj.description}</p>
+                      <p className={`text-xs leading-relaxed ${isDark ? "text-zinc-400" : "text-slate-600"}`}>{proj.description}</p>
                       {proj.url && (
                         <a
                           href={proj.url}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-[11px] text-blue-400 hover:underline inline-flex items-center gap-1 pt-1"
+                          className={`text-[11px] font-medium hover:underline inline-flex items-center gap-1 pt-1 ${
+                            isDark ? "text-blue-400" : "text-blue-600"
+                          }`}
                         >
                           <span>{proj.url}</span>
                           <ExternalLink className="w-3 h-3" />
@@ -651,7 +710,11 @@ export default function DashboardPage() {
 
                     <button
                       onClick={() => handleRemoveProject(proj.id)}
-                      className="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors cursor-pointer"
+                      className={`p-2 rounded-md transition-colors cursor-pointer border ${
+                        isDark
+                          ? "bg-red-500/10 hover:bg-red-500/20 text-red-400 border-red-500/20"
+                          : "bg-red-50 hover:bg-red-100 text-red-600 border-red-200/60"
+                      }`}
                       title="Remove project"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -665,9 +728,9 @@ export default function DashboardPage() {
 
         {/* Tab 4: Skills & Tech Stack */}
         {activeTab === "skills" && (
-          <div className="bg-zinc-900/80 p-6 sm:p-8 rounded-3xl border border-zinc-800 space-y-6">
-            <h3 className="text-base font-semibold text-white flex items-center gap-2">
-              <Code2 className="w-4 h-4 text-blue-400" />
+          <div className={`${panelClass} space-y-6`}>
+            <h3 className={sectionTitleClass}>
+              <Code2 className="w-4 h-4 text-blue-500" />
               <span>Manage Tech Stack & Skills</span>
             </h3>
 
@@ -678,11 +741,11 @@ export default function DashboardPage() {
                 placeholder="Enter skill or framework (e.g. Next.js, Docker, Go)..."
                 value={newSkill}
                 onChange={(e) => setNewSkill(e.target.value)}
-                className="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                className={`flex-1 ${inputClass} py-2`}
               />
               <button
                 type="submit"
-                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer"
+                className="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer shadow-xs"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add</span>
@@ -694,12 +757,18 @@ export default function DashboardPage() {
               {portfolio.skills?.map((skill) => (
                 <span
                   key={skill}
-                  className="px-3 py-1.5 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-medium text-zinc-200 flex items-center gap-2 group hover:border-zinc-700 transition-colors"
+                  className={`px-3 py-1.5 rounded-md border text-xs font-medium flex items-center gap-2 transition-colors ${
+                    isDark
+                      ? "bg-zinc-950 border-zinc-800 text-zinc-200 hover:border-zinc-700"
+                      : "bg-slate-100 border-slate-200 text-slate-800 hover:border-slate-300 shadow-2xs"
+                  }`}
                 >
                   <span>{skill}</span>
                   <button
                     onClick={() => handleRemoveSkill(skill)}
-                    className="text-zinc-500 hover:text-red-400 transition-colors cursor-pointer"
+                    className={`transition-colors cursor-pointer ${
+                      isDark ? "text-zinc-500 hover:text-red-400" : "text-slate-400 hover:text-red-600"
+                    }`}
                     title={`Remove ${skill}`}
                   >
                     &times;
@@ -712,15 +781,15 @@ export default function DashboardPage() {
 
         {/* Tab 5: Social Links */}
         {activeTab === "socials" && (
-          <div className="bg-zinc-900/80 p-6 sm:p-8 rounded-3xl border border-zinc-800 space-y-6">
-            <h3 className="text-base font-semibold text-white flex items-center gap-2">
-              <Share2 className="w-4 h-4 text-blue-400" />
+          <div className={`${panelClass} space-y-6`}>
+            <h3 className={sectionTitleClass}>
+              <Share2 className="w-4 h-4 text-blue-500" />
               <span>Social & External Profiles</span>
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">GitHub Profile URL</label>
+                <label className={labelClass}>GitHub Profile URL</label>
                 <input
                   type="text"
                   value={portfolio.socialLinks?.github || ""}
@@ -729,13 +798,13 @@ export default function DashboardPage() {
                       socialLinks: { ...portfolio.socialLinks, github: e.target.value },
                     })
                   }
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-blue-500"
+                  className={inputClass}
                   placeholder="https://github.com/..."
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">LinkedIn Profile URL</label>
+                <label className={labelClass}>LinkedIn Profile URL</label>
                 <input
                   type="text"
                   value={portfolio.socialLinks?.linkedin || ""}
@@ -744,13 +813,13 @@ export default function DashboardPage() {
                       socialLinks: { ...portfolio.socialLinks, linkedin: e.target.value },
                     })
                   }
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-blue-500"
+                  className={inputClass}
                   placeholder="https://linkedin.com/in/..."
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">X / Twitter URL</label>
+                <label className={labelClass}>X / Twitter URL</label>
                 <input
                   type="text"
                   value={portfolio.socialLinks?.twitter || ""}
@@ -759,13 +828,13 @@ export default function DashboardPage() {
                       socialLinks: { ...portfolio.socialLinks, twitter: e.target.value },
                     })
                   }
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-blue-500"
+                  className={inputClass}
                   placeholder="https://x.com/..."
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">YouTube Channel URL</label>
+                <label className={labelClass}>YouTube Channel URL</label>
                 <input
                   type="text"
                   value={portfolio.socialLinks?.youtube || ""}
@@ -774,13 +843,13 @@ export default function DashboardPage() {
                       socialLinks: { ...portfolio.socialLinks, youtube: e.target.value },
                     })
                   }
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-blue-500"
+                  className={inputClass}
                   placeholder="https://youtube.com/@..."
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">Instagram Profile URL</label>
+                <label className={labelClass}>Instagram Profile URL</label>
                 <input
                   type="text"
                   value={portfolio.socialLinks?.instagram || ""}
@@ -789,13 +858,13 @@ export default function DashboardPage() {
                       socialLinks: { ...portfolio.socialLinks, instagram: e.target.value },
                     })
                   }
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-blue-500"
+                  className={inputClass}
                   placeholder="https://instagram.com/..."
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">Personal Website URL</label>
+                <label className={labelClass}>Personal Website URL</label>
                 <input
                   type="text"
                   value={portfolio.socialLinks?.website || ""}
@@ -804,7 +873,7 @@ export default function DashboardPage() {
                       socialLinks: { ...portfolio.socialLinks, website: e.target.value },
                     })
                   }
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-blue-500"
+                  className={inputClass}
                   placeholder="https://yourdomain.com"
                 />
               </div>
