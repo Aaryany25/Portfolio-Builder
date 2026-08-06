@@ -390,11 +390,41 @@ export default function DashboardPage() {
 
         {/* Tab 1: Personal Profile */}
         {activeTab === "profile" && (
-          <div className={`space-y-6 ${panelClass}`}>
-            <h3 className={sectionTitleClass}>
-              <User className="w-4 h-4 text-blue-500" />
-              <span>Personal Information</span>
-            </h3>
+          <div className="space-y-6">
+            {/* Template Selector Card */}
+            <div className={panelClass}>
+              <h3 className={sectionTitleClass}>
+                <Sparkles className="w-4 h-4 text-blue-500" />
+                <span>Choose Portfolio Template</span>
+              </h3>
+              <p className={`text-xs mt-1 mb-4 ${isDark ? "text-zinc-400" : "text-slate-500"}`}>
+                Select the template style you want to display to visitors.
+              </p>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div
+                  className={`p-4 rounded-xl border text-left flex flex-col gap-2 border-blue-600 ring-2 ring-blue-500/20 bg-blue-50/50 dark:bg-blue-950/20`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className={`font-bold text-sm ${isDark ? "text-white" : "text-slate-900"}`}>
+                      Template 1: Classic Minimalist
+                    </span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-600 text-white">
+                      Active
+                    </span>
+                  </div>
+                  <p className={`text-xs ${isDark ? "text-zinc-400" : "text-slate-500"}`}>
+                    Clean single-column layout with GitHub activity heatmap, repo cards, and compact sections.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className={panelClass}>
+              <h3 className={sectionTitleClass}>
+                <User className="w-4 h-4 text-blue-500" />
+                <span>Personal Information</span>
+              </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
@@ -497,7 +527,8 @@ export default function DashboardPage() {
               />
             </div>
           </div>
-        )}
+        </div>
+      )}
 
         {/* Tab 2: Work Experience */}
         {activeTab === "experience" && (

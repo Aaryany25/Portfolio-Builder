@@ -7,7 +7,7 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import Navbar from "./components/Navbar";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Mail, ShieldCheck, ArrowRight, Sparkles, LayoutGrid } from "lucide-react";
-
+import background from "../public/AI_Bg_054.png"
 function GithubIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
     <svg className={className} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -20,10 +20,12 @@ export default function Home() {
   const { data: session, status } = useSession();
 
   return (
-    <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-zinc-950 font-sans text-zinc-900 dark:text-zinc-100 selection:bg-blue-500 selection:text-white">
-      <Navbar />
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-transparent font-[family-name:var(--font-geist-sans)] text-zinc-900 dark:text-zinc-100 selection:bg-blue-500 selection:text-white">
+      {/* <div className="absolute inset-0 -z-10 bg-[linear-gradient(135deg,_#f8fbff_0%,_#eff6ff_45%,_#fdf2f8_100%)] dark:bg-[linear-gradient(135deg,_#09090b_0%,_#111827_50%,_#1f2937_100%)]" /> */}
+      <Image height={100} width={100} src={background} alt="bg" className="w-full h-full object-cover fixed top-0 left-0 -z-10"/>
+      {/* <Navbar /> */}
 
-      <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col gap-10">
+      <main className="flex-1 z-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col gap-10">
 
 
         {/* Main Hero Content */}
@@ -33,18 +35,18 @@ export default function Home() {
             <span>AI-Powered Portfolio Builder</span>
           </div> */}
 
-          <h1 className="max-w-4xl text-4xl sm:text-6xl font-extrabold tracking-tight text-zinc-900 dark:text-white leading-[1.15]">
+          <h1 className="max-w-4xl text-4xl sm:text-6xl font tracking-tight text-zinc-900 dark:text-white leading-[1.15]">
             Choose a Portfolio Template & Deploy in 5 Minutes
           </h1>
 
-          <p className="max-w-2xl text-base sm:text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed">
+          <p className="max-w-2xl text-base sm:text-lg text-zinc-900 dark:text-zinc-400 leading-relaxed">
             Connect your GitHub, choose a modern portfolio template, customize your content, and publish instantly. Keep everything up to date with one-click GitHub sync.
           </p>
  <Button
                 size="lg"
                 variant="outline"
                 // onClick={() => signIn("github")}
-                className="w-full sm:w-auto h-12 px-8 rounded-full bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-semibold shadow-lg transition-all flex items-center justify-center gap-3 text-base"
+                className="w-full sm:w-auto h-12 px-8 rounded-2xl bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-semibold shadow-lg transition-all flex items-center justify-center gap-3 text-base"
               >
                 {/* <GithubIcon className="w-5 h-5" /> */}
                  <Link href="/Template" className=" transition-colors">
