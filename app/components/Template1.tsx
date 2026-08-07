@@ -172,9 +172,12 @@ export default function Template1() {
   const displayEmail = portfolio.email || githubUser?.email || "";
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? "dark bg-zinc-950 text-zinc-100" : "bg-[#fcfbf9] text-zinc-900"} font-sans transition-colors duration-200 selection:bg-zinc-800 selection:text-white dark:selection:bg-zinc-200 dark:selection:text-zinc-900 pb-16`}>
+    <div className={`min-h-screen relative ${isDarkMode ? "dark bg-zinc-950 text-zinc-100" : "bg-[#fcfbf9] text-zinc-900"} font-sans transition-colors duration-200 selection:bg-zinc-800 selection:text-white dark:selection:bg-zinc-200 dark:selection:text-zinc-900 pb-16`}>
       {/* Outer Centered Container */}
+      {/* <div className="w-30 min-h-screen bg-red-500 "></div */}
+
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-10">
+       {/* <div className='absolute inset-y-0 left-50 h-full w-20  bg-gradient-to-b from-neutral-300/50 via-neutral-200 to-transparent '></div> */}
         
         {/* Top Header / Navigation */}
         <header className="flex items-center justify-between text-sm text-zinc-500 dark:text-zinc-400">

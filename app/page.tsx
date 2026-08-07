@@ -23,12 +23,12 @@ export default function Home() {
     <div className="min-h-screen flex flex-col relative overflow-hidden bg-transparent font-[family-name:var(--font-geist-sans)] text-zinc-900 dark:text-zinc-100 selection:bg-blue-500 selection:text-white">
       {/* <div className="absolute inset-0 -z-10 bg-[linear-gradient(135deg,_#f8fbff_0%,_#eff6ff_45%,_#fdf2f8_100%)] dark:bg-[linear-gradient(135deg,_#09090b_0%,_#111827_50%,_#1f2937_100%)]" /> */}
       <Image height={100} width={100} src={background} alt="bg" className="w-full h-full object-cover fixed top-0 left-0 -z-10"/>
-      {/* <Navbar /> */}
 
       <main className="flex-1 z-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col gap-10">
 
 
         {/* Main Hero Content */}
+      {/* <Navbar /> */}
         <div className="flex flex-col items-center text-center gap-6 py-8 sm:py-14">
           {/* <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400">
             <Sparkles className="w-4 h-4" />
